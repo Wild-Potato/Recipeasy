@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserCredentials } from 'src/app/models/user-credentials.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -9,13 +12,14 @@ import { AbstractControl, FormControl, FormGroup, ValidationErrors } from '@angu
 export class SignUpPage implements OnInit {
 
   signupForm: FormGroup;
-  constructor() { 
+  signUpError:boolean = false;
+  constructor(private auth:AuthService, private router:Router) { 
     this.signupForm = new FormGroup(
     {
       email: new FormControl(),
       
       password: new FormControl(),
-      passconfirm: new FormControl()
+      passwordConfirmation: new FormControl()
     }, [this.passwordMatch]
   );}
 
@@ -33,7 +37,19 @@ export class SignUpPage implements OnInit {
   ngOnInit(): void {
   }
   signUp(){
-    alert(JSON.stringify(this.signupForm.value));
+    if(this.signupForm.valid)
+    {
+      console.log(this.signupForm.value);
+      if(this.auth.signUp(new UserCredentials(this.signupForm.value) ))
+      {
+        alert('ok');
+        this.router.navigate(['/recipes']);
+        
+      }
+      else{
+        this.signUpError=true;
+      }
+    }
   }
 
 }
